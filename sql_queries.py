@@ -36,20 +36,20 @@ CREATE TABLE IF NOT EXISTS users
 
 song_table_create = ("""
 CREATE TABLE IF NOT EXISTS songs
-(song_id int,
+(song_id varchar PRIMARY KEY,
  title varchar,
- artist_id int,
+ artist_id varchar,
  year int,
  duration float)
 """)
 
 artist_table_create = ("""
 CREATE TABLE IF NOT EXISTS artists
-(artist_id int,
- name varchar,
- location varchar,
- latitude int,
- longitude int)
+(artist_id varchar PRIMARY KEY,
+ artist_name varchar,
+ artist_location varchar,
+ artist_latitude int,
+ artist_longitude int)
 """)
 
 time_table_create = ("""
