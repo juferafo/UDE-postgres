@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS time
  week int,
  month int,
  year int,
- weekday varchar)
+ weekday int)
 """)
 
 # INSERT RECORDS
