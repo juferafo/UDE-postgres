@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS users
  first_name varchar,
  last_name varchar,
  gender varchar,
- level float)
+ level varchar)
 """)
 
 song_table_create = ("""
