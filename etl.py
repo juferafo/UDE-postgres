@@ -3,41 +3,65 @@ import glob
 import psycopg2
 import pandas as pd
 from sql_queries import *
+from lib import get_columns
 
 
 def process_song_file(cur, filepath):
     # open song file
-    df = 
+    df = pd.read_json(filepath, lines=True)
+    # To avoid problems ingesting NaN values I convert these values into None
+    df = df.where(pd.notnull(df), None)
 
     # insert song record
-    song_data = 
+    song_columns = get_columns(table="songs", as_string=False)
+    song_data = df[song_columns].values.tolist()[0]
     cur.execute(song_table_insert, song_data)
     
     # insert artist record
-    artist_data = 
+    artist_columns = get_columns(table="artists", as_string=False)
+    artist_data = df[artist_columns].values.tolist()[0]
     cur.execute(artist_table_insert, artist_data)
 
 
 def process_log_file(cur, filepath):
     # open log file
-    df = 
+    df = pd.read_json(filepath, lines=True)
+    # To avoid problems ingesting NaN values I convert these values into None
+    df = df.where(pd.notnull(df), None)
 
     # filter by NextSong action
-    df = 
-
+    df = df[df['page'] == "NextSong"]
+    
     # convert timestamp column to datetime
-    t = 
+    t = pd.to_datetime(df["ts"], unit='ms') 
+    
+    df["hour"] = t.dt.hour
+    df["day"] = t.dt.day
+    df["weekofyear"] = t.dt.weekofyear
+    df["month"] = t.dt.month
+    df["year"] = t.dt.year
+    df["weekday"] = t.dt.weekday
     
     # insert time data records
-    time_data = 
-    column_labels = 
-    time_df = 
+    time_data = (t,\
+                 t.dt.hour,\
+                 t.dt.day,\
+                 t.dt.weekofyear,\
+                 t.dt.month,\
+                 t.dt.year,\
+                 t.dt.weekday) 
+    
+    column_labels = ("tsdt", "hour", "day", "weekofyear", "month", "year", "weekday")
+    
+    time_dic = dict(zip(column_labels, time_data))
+    time_df = pd.DataFrame.from_dict(time_dic) 
 
     for i, row in time_df.iterrows():
         cur.execute(time_table_insert, list(row))
 
     # load user table
-    user_df = 
+    user_columns = ["userId", "firstName", "lastName", "gender", "level"]
+    user_df = df[user_columns]
 
     # insert user records
     for i, row in user_df.iterrows():
@@ -45,20 +69,20 @@ def process_log_file(cur, filepath):
 
     # insert songplay records
     for index, row in df.iterrows():
-        
+
         # get songid and artistid from song and artist tables
         cur.execute(song_select, (row.song, row.artist, row.length))
         results = cur.fetchone()
-        
+
         if results:
             songid, artistid = results
         else:
             songid, artistid = None, None
 
         # insert songplay record
-        songplay_data = 
+        songplay_data = [row.ts, row.userId, row.level, songid, artistid, row.sessionId, row.location, row.userAgent]
         cur.execute(songplay_table_insert, songplay_data)
-
+            
 
 def process_data(cur, conn, filepath, func):
     # get all files matching extension from directory

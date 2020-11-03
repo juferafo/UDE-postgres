@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS songplays
  ts bigint, 
  user_id int, 
  level varchar, 
- song_id int, 
- artist_id int, 
+ song_id varchar, 
+ artist_id varchar, 
  session_id int, 
  location varchar, 
  user_agent varchar)
@@ -64,7 +64,10 @@ CREATE TABLE IF NOT EXISTS time
 # INSERT RECORDS
 
 songplay_table_insert = ("""
-#""")
+    INSERT INTO songplays (songplay_id, ts, user_id, level, song_id,
+                           artist_id, session_id, location, user_agent)
+    VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s);
+""")
 
 user_columns_str = get_columns(table="users")
 insert_format = data_format(table="users")
