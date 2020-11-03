@@ -1,3 +1,5 @@
+from lib import get_columns, data_format
+
 # DROP TABLES
 
 songplay_table_drop = "DROP TABLE IF EXISTS songplays"
@@ -8,16 +10,12 @@ time_table_drop = "DROP TABLE IF EXISTS time"
 
 # CREATE TABLES
 
-'''
-Tables created matching the names of the columns in the log_data and song_data files
-'''
-
 songplay_table_create = ("""
 CREATE TABLE IF NOT EXISTS songplays 
 (songplay_id int,
- ts int, 
+ ts bigint, 
  user_id int, 
- level float, 
+ level varchar, 
  song_id int, 
  artist_id int, 
  session_id int, 
@@ -66,28 +64,39 @@ CREATE TABLE IF NOT EXISTS time
 # INSERT RECORDS
 
 songplay_table_insert = ("""
-""")
+#""")
 
-user_table_insert = ("""
-""")
+user_columns_str = get_columns(table="users")
+insert_format = data_format(table="users")
+user_table_insert = "INSERT INTO users {} VALUES {}".format(user_columns_str,\
+                                                            insert_format)
 
-song_table_insert = ("""
-""")
+song_columns_str = get_columns(table="songs")
+insert_format = data_format(table="songs")
+song_table_insert = "INSERT INTO songs {} VALUES {} ON CONFLICT DO NOTHING".format(song_columns_str,\
+                                                                                   insert_format)
 
-artist_table_insert = ("""
-""")
+artist_columns_str = get_columns(table="artists")
+insert_format = data_format(table="artists")
+artist_table_insert = "INSERT INTO artists {} VALUES {} ON CONFLICT DO NOTHING".format(artist_columns_str,\
+                                                                                       insert_format)
 
-
-time_table_insert = ("""
-""")
+time_columns_str = get_columns(table="time")
+insert_format = data_format(table="time")
+time_table_insert = "INSERT INTO time {} VALUES {} ON CONFLICT DO NOTHING".format(time_columns_str,\
+                                                                                  insert_format)
 
 # FIND SONGS
 
-song_select = ("""
-""")
+song_select = "SELECT s.song_id, a.artist_id \
+               FROM artists AS a \
+               INNER JOIN songs AS s \
+               ON a.artist_id = s.artist_id \
+               WHERE s.title = %s AND \
+                     a.artist_name = %s AND \
+                     s.duration = %s"
 
 # QUERY LISTS
 
-#create_table_queries = [songplay_table_create]
 create_table_queries = [songplay_table_create, user_table_create, song_table_create, artist_table_create, time_table_create]
 drop_table_queries = [songplay_table_drop, user_table_drop, song_table_drop, artist_table_drop, time_table_drop]
