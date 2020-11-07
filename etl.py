@@ -7,18 +7,28 @@ from lib import get_columns
 
 
 def process_song_file(cur, filepath):
+    '''
+    This method process the son_files
+    
+    For the songand artists tables I chose the same names as the ones in the dataframe columns
+    so I can make use of get_columns() defined in lib.py to retrieve their names and 
+    select the data from the dataframe.
+    Example:
+                song_columns = get_columns(cursor=cur, table="songs")
+    '''
+    
     # open song file
     df = pd.read_json(filepath, lines=True)
     # To avoid problems ingesting NaN values I convert these values into None
     df = df.where(pd.notnull(df), None)
 
     # insert song record
-    song_columns = get_columns(table="songs", as_string=False)
+    song_columns = get_columns(cursor=cur, table="songs", as_string=False)
     song_data = df[song_columns].values.tolist()[0]
     cur.execute(song_table_insert, song_data)
     
     # insert artist record
-    artist_columns = get_columns(table="artists", as_string=False)
+    artist_columns = get_columns(cursor=cur, table="artists", as_string=False)
     artist_data = df[artist_columns].values.tolist()[0]
     cur.execute(artist_table_insert, artist_data)
 
@@ -43,7 +53,7 @@ def process_log_file(cur, filepath):
     df["weekday"] = t.dt.weekday
     
     # insert time data records
-    time_data = (t,\
+    time_data = (df.ts,\
                  t.dt.hour,\
                  t.dt.day,\
                  t.dt.weekofyear,\
@@ -51,7 +61,7 @@ def process_log_file(cur, filepath):
                  t.dt.year,\
                  t.dt.weekday) 
     
-    column_labels = ("tsdt", "hour", "day", "weekofyear", "month", "year", "weekday")
+    column_labels = ("ts", "hour", "day", "weekofyear", "month", "year", "weekday")
     
     time_dic = dict(zip(column_labels, time_data))
     time_df = pd.DataFrame.from_dict(time_dic) 

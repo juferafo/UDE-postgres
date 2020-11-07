@@ -1,4 +1,6 @@
-from lib import get_columns, data_format
+import psycopg2
+from lib import get_columns
+
 
 # DROP TABLES
 
@@ -11,89 +13,98 @@ time_table_drop = "DROP TABLE IF EXISTS time"
 # CREATE TABLES
 
 songplay_table_create = ("""
-CREATE TABLE IF NOT EXISTS songplays 
-(songplay_id int,
- ts bigint, 
- user_id int, 
- level varchar, 
- song_id varchar, 
- artist_id varchar, 
- session_id int, 
- location varchar, 
- user_agent varchar)
+    CREATE TABLE IF NOT EXISTS songplays (
+        songplay_id SERIAL PRIMARY KEY,
+        start_time BIGINT, 
+        user_id INT, 
+        level VARCHAR, 
+        song_id VARCHAR, 
+        artist_id VARCHAR, 
+        session_id INT, 
+        location VARCHAR, 
+        user_agent VARCHAR
+        )
 """)
 
 user_table_create = ("""
-CREATE TABLE IF NOT EXISTS users
-(user_id int,
- first_name varchar,
- last_name varchar,
- gender varchar,
- level varchar)
+    CREATE TABLE IF NOT EXISTS users (
+        user_id INT PRIMARY KEY,
+        first_name VARCHAR,
+        last_name VARCHAR,
+        gender VARCHAR,
+        level VARCHAR
+        )
 """)
 
 song_table_create = ("""
-CREATE TABLE IF NOT EXISTS songs
-(song_id varchar PRIMARY KEY,
- title varchar,
- artist_id varchar,
- year int,
- duration float)
+    CREATE TABLE IF NOT EXISTS songs (
+        song_id VARCHAR PRIMARY KEY,
+        title VARCHAR,
+        artist_id VARCHAR,
+        year INT,
+        duration FLOAT
+        )
 """)
 
 artist_table_create = ("""
-CREATE TABLE IF NOT EXISTS artists
-(artist_id varchar PRIMARY KEY,
- artist_name varchar,
- artist_location varchar,
- artist_latitude int,
- artist_longitude int)
+    CREATE TABLE IF NOT EXISTS artists (
+        artist_id VARCHAR PRIMARY KEY,
+        artist_name VARCHAR,
+        artist_location VARCHAR,
+        artist_latitude INT,
+        artist_longitude INT
+        )
 """)
 
 time_table_create = ("""
-CREATE TABLE IF NOT EXISTS time
-(start_time timestamp,
- hour int,
- day int,
- week int,
- month int,
- year int,
- weekday int)
+    CREATE TABLE IF NOT EXISTS time (
+        start_time BIGINT PRIMARY KEY,
+        hour INT,
+        day INT,
+        week INT,
+        month INT,
+        year INT,
+        weekday INT
+    )
 """)
 
 # INSERT RECORDS
 
 songplay_table_insert = ("""
-    INSERT INTO songplays (songplay_id, ts, user_id, level, song_id,
+    INSERT INTO songplays (songplay_id, start_time, user_id, level, song_id,
                            artist_id, session_id, location, user_agent)
     VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s);
 """)
 
-user_columns_str = get_columns(table="users")
-insert_format = data_format(table="users")
-user_table_insert = "INSERT INTO users {} VALUES {}".format(user_columns_str,\
-                                                            insert_format)
+user_table_insert = ("""
+    INSERT INTO users (user_id, first_name, last_name, gender, level) 
+    VALUES (%s, %s, %s, %s, %s)
+    ON CONFLICT DO NOTHING
+""")
 
-song_columns_str = get_columns(table="songs")
-insert_format = data_format(table="songs")
-song_table_insert = "INSERT INTO songs {} VALUES {} ON CONFLICT DO NOTHING".format(song_columns_str,\
-                                                                                   insert_format)
+song_table_insert = ("""
+    INSERT INTO songs (song_id, title, artist_id, year, duration) 
+    VALUES (%s, %s, %s, %s, %s)
+    ON CONFLICT DO NOTHING
+""")
 
-artist_columns_str = get_columns(table="artists")
-insert_format = data_format(table="artists")
-artist_table_insert = "INSERT INTO artists {} VALUES {} ON CONFLICT DO NOTHING".format(artist_columns_str,\
-                                                                                       insert_format)
+artist_table_insert = ("""
+    INSERT INTO artists (artist_id, artist_name, artist_location, artist_latitude, artist_longitude) 
+    VALUES (%s, %s, %s, %s, %s)
+    ON CONFLICT DO NOTHING
+""")
 
-time_columns_str = get_columns(table="time")
-insert_format = data_format(table="time")
-time_table_insert = "INSERT INTO time {} VALUES {} ON CONFLICT DO NOTHING".format(time_columns_str,\
-                                                                                  insert_format)
+time_table_insert = ("""
+    INSERT INTO time (start_time, hour, day, week, month, year, weekday)
+    VALUES (%s, %s, %s, %s, %s, %s, %s) 
+    ON CONFLICT DO NOTHING
+""")
 
 # FIND SONGS
 
 song_select = "SELECT s.song_id, a.artist_id \
-               FROM artists AS a \
-               INNER JOIN songs AS s \
+               FROM songs AS s \
+               JOIN artists AS a \
                ON a.artist_id = s.artist_id \
                WHERE s.title = %s AND \
                      a.artist_name = %s AND \

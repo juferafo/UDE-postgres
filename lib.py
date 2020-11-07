@@ -1,8 +1,9 @@
 # This script contains helper methods used to manage the Postgres tables
 
-import psycopg2
-
 def connect_sparkify():
+    
+    import psycopg2
+
     connection = psycopg2.connect("host=127.0.0.1 dbname=sparkifydb user=student password=student")
     connection.set_session(autocommit=True)
     cursor = connection.cursor()
@@ -21,21 +22,16 @@ def run_query(cursor, query, print_results=True):
             print(r)
             
             
-def get_columns(table, cursor=None, connection=None, as_string=True):
+def get_columns(cursor, table, as_string=True):
     '''
     This returns the column names of the table.
     If as_string is set to True, the column names will be passed as
     an string with the fromat (col1, clo2, ...) to be used in SQL INSERT statements
     '''
-    
-    if (not cursor) and (not connection):
-        cursor, connection = connect_sparkify()
-    
+            
     cursor.execute("SELECT * FROM {} LIMIT 0".format(table))
     colnames = [desc[0] for desc in cursor.description]
-    
-    connection.close()
-    
+        
     if as_string:
         return "("+", ".join(map(str, colnames))+")"
     else:
