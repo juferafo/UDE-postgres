@@ -1,6 +1,9 @@
 # This script contains helper methods used to manage the Postgres tables
 
 def connect_sparkify():
+    """
+    This method can be used to connect to the "sparkify" database
+    """
     
     import psycopg2
 
@@ -10,10 +13,13 @@ def connect_sparkify():
     
     return cursor, connection
 
+
 def run_query(cursor, query, print_results=True):
-    '''
-    This method executes the query provided
-    '''
+    """
+    This method can be used to execute a query provided.
+    If the parameter print_results is set to True, 
+    the output of the query will be printed.
+    """
     
     cursor.execute(query)
     if print_results:
@@ -23,11 +29,11 @@ def run_query(cursor, query, print_results=True):
             
             
 def get_columns(cursor, table, as_string=True):
-    '''
-    This returns the column names of the table.
-    If as_string is set to True, the column names will be passed as
-    an string with the fromat (col1, clo2, ...) to be used in SQL INSERT statements
-    '''
+    """
+    This method returns the column names of a given <table>.
+    If the parameter as_string is set to True, the column names will be passed as
+    an string with the fromat (col1, clo2, ...) that can be used in SQL-like INSERT statements
+    """
             
     cursor.execute("SELECT * FROM {} LIMIT 0".format(table))
     colnames = [desc[0] for desc in cursor.description]
@@ -52,15 +58,11 @@ def data_format(table):
     return "("+format_columns+")"
     
 
-def insert_song_data(filepath,\
-                     cursor,\
-                     connection,\
-                     table):
-    
-    '''
+def insert_song_data(filepath, cursor, connection, table):
+    """
     This method extracts data from ./data/song_data/ files and insert it into the target <table> 
-    Before calling this method take into account that song_id is PRIMARY KEY 
-    '''
+    Before calling this method take into account that song_id is PRIMARY KEY.
+    """
     
     df = pd.read_json(filepath, lines=True)
     df = df.where(pd.notnull(df), None)

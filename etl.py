@@ -7,15 +7,13 @@ from lib import get_columns
 
 
 def process_song_file(cur, filepath):
-    '''
-    This method process the son_files
-    
-    For the songand artists tables I chose the same names as the ones in the dataframe columns
-    so I can make use of get_columns() defined in lib.py to retrieve their names and 
-    select the data from the dataframe.
-    Example:
-                song_columns = get_columns(cursor=cur, table="songs")
-    '''
+    """
+    This method gets the data from the song_data files and 
+    it inserts records into the "songs" and "artists" tables.
+    For the song and artists tables I chose the same names as the ones in the dataframe columns
+    so I can make use of the get_columns() method defined in lib.py. Such a method retrieve
+    the column names for a given table.
+    """
     
     # open song file
     df = pd.read_json(filepath, lines=True)
@@ -34,6 +32,11 @@ def process_song_file(cur, filepath):
 
 
 def process_log_file(cur, filepath):
+    """
+    This method process the log_data files and it inserts data into 
+    the "time", "users" and "songplays" tables.
+    """
+    
     # open log file
     df = pd.read_json(filepath, lines=True)
     # To avoid problems ingesting NaN values I convert these values into None
@@ -95,6 +98,10 @@ def process_log_file(cur, filepath):
             
 
 def process_data(cur, conn, filepath, func):
+    """
+    This method is used as a wrapper to run the methods "process_song_file" and "process_log_file".
+    """
+    
     # get all files matching extension from directory
     all_files = []
     for root, dirs, files in os.walk(filepath):

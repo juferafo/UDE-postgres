@@ -1,7 +1,6 @@
 import psycopg2
 from lib import get_columns
 
-
 # DROP TABLES
 
 songplay_table_drop = "DROP TABLE IF EXISTS songplays"
