@@ -127,9 +127,9 @@ year INT,
 weekday INT
 ```
 
-As one can see in figure 1, the fact table is connected to the dimension ones with a foreign key that will make possible the use of JOIN statements to bring the data alltogether. 
+As one can see in figure 1, the fact table is connected to the dimension ones with a foreign keys that will make possible the use of JOIN statements to bring the data alltogether. 
 
-INCLUDE FIGURE!
+![Database schema structure](./fig/star.png)
 
 ## Database setup and data ETL pipeline
 
@@ -143,7 +143,8 @@ An automatized procedure was created in order to set-up the database with the af
 
 ## Requirements
 
-psycopg2
-pandas
+Below there are the requirements to run the scripts `./create_table.py` and `./etlp.py`:
 
+1. [`psycopg2`](https://www.psycopg.org/docs/)
+2. [`pandas`](https://pandas.pydata.org/)
 
