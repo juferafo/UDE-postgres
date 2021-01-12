@@ -21,7 +21,27 @@ songplay_table_create = ("""
         artist_id VARCHAR, 
         session_id INT, 
         location VARCHAR, 
-        user_agent VARCHAR
+        user_agent VARCHAR,
+        CONSTRAINT fk_user
+            FOREIGN KEY(user_id) 
+            REFERENCES users(user_id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE,
+        CONSTRAINT fk_song
+            FOREIGN KEY(song_id) 
+            REFERENCES songs(song_id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE,  
+        CONSTRAINT fk_artists
+            FOREIGN KEY(artist_id) 
+            REFERENCES artists(artist_id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE, 
+        CONSTRAINT fk_time
+            FOREIGN KEY(start_time) 
+            REFERENCES time(start_time)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
         )
 """)
 
@@ -78,7 +98,8 @@ songplay_table_insert = ("""
 user_table_insert = ("""
     INSERT INTO users (user_id, first_name, last_name, gender, level) 
     VALUES (%s, %s, %s, %s, %s)
-    ON CONFLICT DO NOTHING
+    ON CONFLICT (user_id) 
+    DO UPDATE SET level = excluded.level
 """)
 
 song_table_insert = ("""
@@ -111,5 +132,5 @@ song_select = "SELECT s.song_id, a.artist_id \
 
 # QUERY LISTS
 
-create_table_queries = [songplay_table_create, user_table_create, song_table_create, artist_table_create, time_table_create]
+create_table_queries = [user_table_create, song_table_create, artist_table_create, time_table_create, songplay_table_create]
 drop_table_queries = [songplay_table_drop, user_table_drop, song_table_drop, artist_table_drop, time_table_drop]
