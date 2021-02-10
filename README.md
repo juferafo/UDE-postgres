@@ -85,7 +85,7 @@ location VARCHAR,
 user_agent VARCHAR
 ```
 
-#### `users` dimension Tables
+#### `users` dimension table
 
 ```
 user_id INT PRIMARY KEY,
@@ -95,7 +95,7 @@ gender VARCHAR,
 level VARCHAR
 ```
 
-#### `songs` dimension Tables
+#### `songs` dimension table
 
 ```
 song_id VARCHAR PRIMARY KEY,
@@ -105,7 +105,7 @@ year INT,
 duration FLOAT
 ```
 
-#### `artists` dimension Tables
+#### `artists` dimension table
 
 ```
 artist_id VARCHAR PRIMARY KEY,
@@ -115,7 +115,7 @@ artist_latitude INT,
 artist_longitude INT
 ````
 
-#### `time` dimension Tables
+#### `time` dimension table
 
 ```
 start_time BIGINT PRIMARY KEY,
